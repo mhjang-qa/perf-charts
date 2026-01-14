@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>다국어 로딩 성능 — Load & PERF_JSON_DONE (avg)</title>
+  
+  <style>
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;
+      margin:0; padding:18px; background:#fafafa; color:#111;
+    }
+    .container{max-width:1200px;margin:0 auto;}
+    h1{margin:0 0 6px;font-size:20px;}
+    .sub{margin:0 0 14px;color:#555;font-size:12px;line-height:1.45;}
+    .card{
+      background:#fff;border:1px solid #e6e6e6;border-radius:12px;
+      padding:14px; box-shadow:0 1px 2px rgba(0,0,0,0.03);
+    }
+    .card h2{margin:0 0 10px;font-size:15px;}
+    .note{margin-top:10px;color:#666;font-size:12px;line-height:1.5;}
+    canvas{width:100% !important; height:520px !important;}
+    @media (max-width: 640px){
+      canvas{height:460px !important;}
+    }
+    code{background:#f3f3f3;padding:2px 6px;border-radius:6px;}
+    .grid{display:grid;grid-template-columns:1fr;gap:14px;}
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>다국어 로딩 성능 — Load & PERF_JSON_DONE (avg)</h1>
+    <p class="sub">데이터 소스: <code>summary_full_20260114_091846.html</code> 요약 테이블 기반 (Chart.js CDN 사용)</p>
+    
+<div class="grid">
+  <div class="card">
+    <h2>전체 집계(avg) — Load (ms)</h2>
+    <canvas id="barLoad"></canvas>
+    <div class="note">문서 로딩 완료 시점 기준 비교용(초기 렌더링(LCP)과 별개로 해석).</div>
+  </div>
+  <div class="card">
+    <h2>전체 집계(avg) — PERF_JSON_DONE (ms)</h2>
+    <canvas id="barPerf"></canvas>
+    <div class="note">API 방식은 요약 데이터에서 “-”로 표기된 구간이 있어 null 처리됩니다.</div>
+  </div>
+</div>
+
+  </div>
+<script>
+const DATA = {"overall": {"networks": ["FAST_4G", "NO_THROTTLE", "SLOW_4G"], "LCP": {"API": [311.2, 211.0, 245.8], "LOCAL": [165.0, 202.8, 183.1], "CDN": [191.2, 230.0, 182.7]}, "Load": {"API": [1147.1, 1243.6, 1172.1], "LOCAL": [1173.2, 1269.0, 1156.8], "CDN": [1169.9, 1253.1, 1166.4]}, "PERF_JSON_DONE": {"API": [null, null, null], "LOCAL": [2174.5, 2373.6, 2183.4], "CDN": [2090.1, 2289.2, 2254.6]}}, "time_labels": ["2026-01-13 17:00", "2026-01-13 18:00", "2026-01-13 19:00", "2026-01-13 20:00", "2026-01-13 21:00", "2026-01-13 22:00", "2026-01-13 23:00", "2026-01-14 00:00", "2026-01-14 01:00", "2026-01-14 02:00", "2026-01-14 03:00", "2026-01-14 04:00", "2026-01-14 05:00", "2026-01-14 06:00", "2026-01-14 07:00", "2026-01-14 08:00"], "hourly": {"LCP": {"FAST_4G": {"API": [640.0, 200.7, 272.0, 282.0, 140.7, 1070.7, null, 152.4, 627.3, 152.3, 154.8, 140.4, 282.2, 392.3, 404.4, 310.7], "LOCAL": [688.0, 202.0, 151.7, 148.7, 139.3, 132.0, null, 156.8, 152.7, 153.3, 149.6, 142.0, 145.5, 136.7, 141.1, 172.4], "CDN": [640.0, 199.3, 152.7, 312.0, 137.0, 138.7, null, 154.4, 151.7, 151.3, 155.2, 143.2, 329.8, 141.0, 137.1, 159.6]}, "NO_THROTTLE": {"API": [null, 246.7, 187.7, 186.7, 293.3, 229.3, null, 204.4, 209.0, 197.0, 204.0, 184.0, 186.5, 196.7, 198.9, 224.4], "LOCAL": [null, 250.0, 183.7, 189.7, 175.3, 224.0, null, 206.8, 211.3, 204.7, 201.6, 185.2, 186.9, 200.7, 202.9, 224.0], "CDN": [null, 248.0, 183.0, 189.0, 176.0, 821.3, null, 199.2, 207.7, 213.7, 207.2, 185.6, 373.5, 203.3, 202.9, 229.8]}, "SLOW_4G": {"API": [null, 173.3, 151.3, 145.3, 254.0, 741.3, null, 303.2, 263.3, 156.3, 154.0, 145.2, 267.3, 265.7, 448.0, 302.2], "LOCAL": [null, 243.3, 152.0, 147.0, 299.7, 309.3, null, 156.0, 142.7, 299.3, 147.6, 147.2, 140.7, 139.0, 150.2, 158.7], "CDN": [null, 167.3, 311.0, 147.7, 144.3, 285.3, null, 152.8, 147.7, 160.7, 148.8, 145.6, 139.6, 139.0, 151.6, 379.1]}}, "Load": {"FAST_4G": {"API": [2541.1, 1385.7, 1329.4, 1207.4, 1134.2, 923.1, null, 1072.8, 1109.4, 1100.9, 1073.2, 1074.1, 1118.4, 1167.0, 1067.1, 1071.5], "LOCAL": [2623.9, 1437.5, 1403.1, 1162.4, 1231.4, 1109.8, null, 1112.7, 1132.8, 1104.7, 1075.0, 1051.7, 1175.1, 1110.8, 1103.5, 1171.0], "CDN": [2700.9, 1376.5, 1354.6, 1117.0, 1160.2, 994.1, null, 1257.7, 1107.9, 1103.1, 1202.7, 1115.7, 1174.6, 1120.8, 1081.5, 1090.3]}, "NO_THROTTLE": {"API": [null, 1456.2, 1263.7, 1243.1, 1223.2, 1304.3, null, 1324.2, 1217.2, 1211.2, 1217.5, 1196.8, 1183.6, 1212.8, 1259.9, 1239.5], "LOCAL": [null, 1635.2, 1372.0, 1218.2, 1202.9, 1291.5, null, 1298.7, 1241.9, 1328.5, 1295.0, 1225.0, 1271.9, 1184.1, 1249.5, 1224.4], "CDN": [null, 1384.0, 1343.1, 1233.3, 1200.9, 1223.4, null, 1340.7, 1274.4, 1209.0, 1199.0, 1168.2, 1197.7, 1278.8, 1251.6, 1197.5]}, "SLOW_4G": {"API": [null, 1296.6, 1407.2, 1291.7, 1210.5, 1089.2, null, 1145.3, 1157.3, 1104.0, 1109.9, 1151.7, 1038.5, 1048.2, 1078.7, 1172.1], "LOCAL": [null, 1193.7, 1374.3, 1180.4, 1210.5, 1234.7, null, 1142.8, 1126.3, 1152.9, 1115.5, 1169.7, 1105.1, 1054.1, 1066.6, 1145.0], "CDN": [null, 1262.8, 1379.8, 1310.3, 1217.9, 1138.4, null, 1082.2, 1177.4, 1233.9, 1086.7, 1094.7, 1089.3, 1078.6, 1087.6, 1068.3]}}}};
+
+
+function makeBar(ctxId, metricKey){
+  const ctx = document.getElementById(ctxId);
+  const labels = DATA.overall.networks;
+  const datasets = ["API","LOCAL","CDN"].map((m)=>({
+    label:m,
+    data: DATA.overall[metricKey][m],
+  }));
+  new Chart(ctx,{
+    type:"bar",
+    data:{labels, datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:"index", intersect:false},
+      plugins:{
+        legend:{position:"top"},
+        tooltip:{callbacks:{label:(item)=>{
+          const v=item.raw; return `${item.dataset.label}: ${v===null?"-":v+" ms"}`;
+        }}}
+      },
+      scales:{y:{beginAtZero:true, ticks:{callback:(v)=>v+" ms"}}}
+    }
+  });
+}
+makeBar("barLoad","Load");
+makeBar("barPerf","PERF_JSON_DONE");
+
+</script>
+</body>
+</html>
