@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>피처별 기준 (표)</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --card:#ffffff;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px 16px 22px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      padding: 14px;
+    }
+    .head{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .dot{ width:6px;height:6px;border-radius:999px;background:var(--text); }
+    .title{ font-size: 13px; font-weight: 900; letter-spacing: 0.2px; }
+    .sub{
+      margin-left:auto;
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      overflow:hidden;
+      border-radius:10px;
+    }
+    thead th{
+      text-align:left;
+      padding: 10px 10px;
+      background:#f3f4f6;
+      border-bottom:1px solid var(--border);
+      font-weight: 800;
+      color:#374151;
+    }
+    tbody td{
+      padding: 9px 10px;
+      border-bottom:1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:nth-child(even){ background: #fcfcfd; }
+    tbody tr.total{
+      background:#f3f4f6;
+      font-weight: 900;
+    }
+    /* 최다 비중 강조 */
+    .hi td{ color:#ef4444; font-weight: 900; }
+    .note{
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="card">
+      <div class="head">
+        <span class="dot"></span>
+        <div class="title">피처별 기준</div>
+        <div class="sub" id="totalCount">총 0건</div>
+      </div>
+
+      <table aria-label="피처 표">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th style="width:90px">건수</th>
+            <th style="width:90px">비율</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyFeature"></tbody>
+      </table>
+
+      <div class="note">
+        * 피처(ATM) 컬럼 내 “(https://…)” 문자열은 자동 제거됩니다.<br/>
+        * 표는 건수 내림차순으로 정렬됩니다.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /**
+     * ✅ 동일 RAW_TSV 복붙
+     */
+    const RAW_TSV = `
+ATM\tID\t결함 유형\t목표버전\t심각도\t우선순위
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청\tISSUE-300\t접근성\t5.18.0\tMajor\t보통
+해외 공과금 납부 진입점  (https://www.notion.so/2e073fbd195180f89277d89c26f5127b?pvs=21)\tISSUE-302\tUX/UI\t5.18.0\tMinor\t보통
+해외 공과금 납부 진입점  (https://www.notion.so/2e073fbd195180f89277d89c26f5127b?pvs=21)\tISSUE-304\tUX/UI\t5.18.0\tMinor\t보통
+해외 공과금 납부 진입점  (https://www.notion.so/2e073fbd195180f89277d89c26f5127b?pvs=21)\tISSUE-305\tUX/UI\t5.18.0\tMinor\t보통
+[커머스] 고객센터 CS버튼 제거 요청 (https://www.notion.so/CS-2e373fbd195180cf963cf1a773a27461?pvs=21)\tISSUE-306\tUX/UI\t5.19.0\tMinor\t보통
+[한마켓] 한마켓 내 SHOP 버튼 기능 오류 개선 (https://www.notion.so/SHOP-2d973fbd195180c4b912c4fccaa51b9f?pvs=21)\tISSUE-307\tUX/UI\t5.19.0\tMinor\t보통
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청 (https://www.notion.so/IOS-AOS-2a973fbd19518050a2e3fa5fda58b8e0?pvs=21)\tISSUE-308\t기능\t대출비교\tMinor\t보통
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청 (https://www.notion.so/IOS-AOS-2a973fbd19518050a2e3fa5fda58b8e0?pvs=21)\tISSUE-309\t기능\t대출비교\tMinor\t보통
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청 (https://www.notion.so/IOS-AOS-2a973fbd19518050a2e3fa5fda58b8e0?pvs=21)\tISSUE-310\tUX/UI\t대출비교\tMinor\t보통
+[한마켓] 한마켓 내 SHOP 버튼 기능 오류 개선 (https://www.notion.so/SHOP-2d973fbd195180c4b912c4fccaa51b9f?pvs=21)\tISSUE-311\t기능\t5.18.0\tMajor\t보통
+\tISSUE-312\t기능\t5.19.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-313\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-314\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-317\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-318\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-320\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-321\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-322\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-323\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-324\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-325\t기능\t5.18.0\tCritical\t높음
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-326\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-327\t기능\t5.18.0\tCritical\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-328\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-329\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-330\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-331\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-332\t기능\t5.18.0\tCritical\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-333\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-334\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-336\t성능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-337\t기능\t5.18.0\t개선 의견\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-338\tUX/UI\t5.19.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-339\tUX/UI\t5.18.0\t개선 의견\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-341\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-342\tUX/UI\t5.18.0\t개선 의견\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-343\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-344\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-345\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-346\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-347\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-348\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-349\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-354\tUX/UI\t5.18.0\tMinor\t보통
+`.trim();
+
+    function parseTSV(tsv){
+      const lines = tsv.split(/\r?\n/).filter(Boolean);
+      const header = lines.shift().split("\t").map(s => s.trim());
+      const rows = [];
+      for (const line of lines){
+        const cols = line.split("\t");
+        const obj = {};
+        header.forEach((h, i) => obj[h] = (cols[i] ?? "").trim());
+        if ((obj["ID"] || "").length === 0) continue;
+        rows.push(obj);
+      }
+      return rows;
+    }
+
+    // "(https://...)" 제거
+    function stripHttpParen(text){
+      if (!text) return "";
+      return text
+        .replace(/\s*\((https?:\/\/[^)]+)\)\s*/gi, " ")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+    }
+
+    function pct(n, total){
+      if (!total) return "0.0%";
+      return (Math.round((n/total)*1000)/10).toFixed(1) + "%";
+    }
+
+    function aggCount(rows, field, normalizeFn = (v)=>v){
+      const map = new Map();
+      for (const r of rows){
+        const raw = (r[field] ?? "").trim();
+        const key = normalizeFn(raw || "(빈값)");
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+      return map;
+    }
+
+    function toEntries(map){
+      const arr = [];
+      map.forEach((count, key) => arr.push({ key, count }));
+      return arr.sort((a,b)=> b.count - a.count || a.key.localeCompare(b.key));
+    }
+
+    function renderTable(tbodyEl, entries, total){
+      tbodyEl.innerHTML = "";
+      const max = entries.reduce((m,e)=> Math.max(m, e.count), 0);
+      const maxKeys = new Set(entries.filter(e=>e.count===max).map(e=>e.key));
+
+      for (const e of entries){
+        const tr = document.createElement("tr");
+        if (maxKeys.has(e.key)) tr.classList.add("hi");
+
+        const td1 = document.createElement("td");
+        td1.textContent = e.key;
+
+        const td2 = document.createElement("td");
+        td2.textContent = String(e.count);
+
+        const td3 = document.createElement("td");
+        td3.textContent = pct(e.count, total);
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tbodyEl.appendChild(tr);
+      }
+
+      const trT = document.createElement("tr");
+      trT.className = "total";
+      trT.innerHTML = `<td>총 합계</td><td>${total}</td><td>100%</td>`;
+      tbodyEl.appendChild(trT);
+    }
+
+    // run
+    const rows = parseTSV(RAW_TSV);
+    const total = rows.length;
+
+    document.getElementById("totalCount").textContent = `총 ${total}건`;
+
+    const featMap = aggCount(rows, "ATM", (v)=> stripHttpParen(v || "(빈값)"));
+    const featEntries = toEntries(featMap);
+
+    renderTable(document.getElementById("tbodyFeature"), featEntries, total);
+  </script>
+</body>
+</html>
