@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>결함 집계 리포트</title>
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --card:#ffffff;
+      --row:#f9fafb;
+
+      --bar:#111827;
+
+      --critical:#111827;
+      --major:#2563eb;
+      --minor:#ef4444;
+      --trivial:#9ca3af;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .wrap{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 16px 22px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1.4fr;
+      gap: 16px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      padding: 14px;
+    }
+
+    .head{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .dot{
+      width:6px;height:6px;border-radius:999px;background:var(--text);
+    }
+    .title{
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+
+    .sub{
+      margin-left:auto;
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      overflow:hidden;
+      border-radius:10px;
+    }
+    thead th{
+      text-align:left;
+      padding: 10px 10px;
+      background:#f3f4f6;
+      border-bottom:1px solid var(--border);
+      font-weight: 800;
+      color:#374151;
+    }
+    tbody td{
+      padding: 9px 10px;
+      border-bottom:1px solid var(--border);
+      vertical-align: middle;
+    }
+    tbody tr:nth-child(even){ background: #fcfcfd; }
+    tbody tr.total{
+      background:#f3f4f6;
+      font-weight: 900;
+    }
+
+    .kpi{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      font-weight: 800;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      background:#f3f4f6;
+      color:#111827;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .barwrap{
+      margin-top: 10px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .barrow{
+      display:grid;
+      grid-template-columns: 90px 1fr 64px;
+      gap: 10px;
+      align-items:center;
+      font-size: 12px;
+    }
+    .barname{
+      font-weight: 800;
+      color:#374151;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .barbg{
+      height: 10px;
+      background:#eef2f7;
+      border-radius:999px;
+      overflow:hidden;
+      border:1px solid #e7ebf2;
+    }
+    .barfill{
+      height:100%;
+      width:0%;
+      background: var(--bar);
+      border-radius:999px;
+    }
+    .barval{
+      text-align:right;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* 강조(가장 큰 비중) */
+    .hi td{ color:#ef4444; font-weight: 900; }
+    .hi .barfill{ background:#ef4444; }
+
+    .note{
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1100px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="grid">
+      <!-- 심각도 -->
+      <section class="card">
+        <div class="head">
+          <span class="dot"></span>
+          <div class="title">심각도 기준</div>
+          <div class="sub" id="totalCount1">총 0건</div>
+        </div>
+
+        <table aria-label="심각도 표">
+          <thead>
+            <tr>
+              <th style="width:55%">구분</th>
+              <th style="width:20%">건수</th>
+              <th style="width:25%">비율</th>
+            </tr>
+          </thead>
+          <tbody id="tbodySeverity"></tbody>
+        </table>
+
+        <div class="barwrap" id="barsSeverity"></div>
+      </section>
+
+      <!-- 유형 -->
+      <section class="card">
+        <div class="head">
+          <span class="dot"></span>
+          <div class="title">유형별 기준</div>
+          <div class="sub" id="totalCount2">총 0건</div>
+        </div>
+
+        <table aria-label="유형 표">
+          <thead>
+            <tr>
+              <th style="width:55%">구분</th>
+              <th style="width:20%">건수</th>
+              <th style="width:25%">비율</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyType"></tbody>
+        </table>
+
+        <div class="barwrap" id="barsType"></div>
+      </section>
+
+      <!-- 피처 -->
+      <section class="card">
+        <div class="head">
+          <span class="dot"></span>
+          <div class="title">피처별 기준</div>
+          <div class="sub" id="totalCount3">총 0건</div>
+        </div>
+
+        <table aria-label="피처 표">
+          <thead>
+            <tr>
+              <th>구분</th>
+              <th style="width:90px">건수</th>
+              <th style="width:90px">비율</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyFeature"></tbody>
+        </table>
+
+
+      </section>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ✅ 원본 데이터(탭 구분 TSV)
+     * - 헤더: ATM, ID, 결함 유형, 목표버전, 심각도, 우선순위
+     * - 아래 문자열만 바꾸면 다른 리포트도 그대로 재사용 가능
+     */
+    const RAW_TSV = `
+ATM\tID\t결함 유형\t목표버전\t심각도\t우선순위
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청\tISSUE-300\t접근성\t5.18.0\tMajor\t보통
+해외 공과금 납부 진입점  (https://www.notion.so/2e073fbd195180f89277d89c26f5127b?pvs=21)\tISSUE-302\tUX/UI\t5.18.0\tMinor\t보통
+해외 공과금 납부 진입점  (https://www.notion.so/2e073fbd195180f89277d89c26f5127b?pvs=21)\tISSUE-304\tUX/UI\t5.18.0\tMinor\t보통
+해외 공과금 납부 진입점  (https://www.notion.so/2e073fbd195180f89277d89c26f5127b?pvs=21)\tISSUE-305\tUX/UI\t5.18.0\tMinor\t보통
+[커머스] 고객센터 CS버튼 제거 요청 (https://www.notion.so/CS-2e373fbd195180cf963cf1a773a27461?pvs=21)\tISSUE-306\tUX/UI\t5.19.0\tMinor\t보통
+[한마켓] 한마켓 내 SHOP 버튼 기능 오류 개선 (https://www.notion.so/SHOP-2d973fbd195180c4b912c4fccaa51b9f?pvs=21)\tISSUE-307\tUX/UI\t5.19.0\tMinor\t보통
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청 (https://www.notion.so/IOS-AOS-2a973fbd19518050a2e3fa5fda58b8e0?pvs=21)\tISSUE-308\t기능\t대출비교\tMinor\t보통
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청 (https://www.notion.so/IOS-AOS-2a973fbd19518050a2e3fa5fda58b8e0?pvs=21)\tISSUE-309\t기능\t대출비교\tMinor\t보통
+[네이티브-IOS,AOS] 대출비교 화면 이동 브릿지 개발 요청 (https://www.notion.so/IOS-AOS-2a973fbd19518050a2e3fa5fda58b8e0?pvs=21)\tISSUE-310\tUX/UI\t대출비교\tMinor\t보통
+[한마켓] 한마켓 내 SHOP 버튼 기능 오류 개선 (https://www.notion.so/SHOP-2d973fbd195180c4b912c4fccaa51b9f?pvs=21)\tISSUE-311\t기능\t5.18.0\tMajor\t보통
+\tISSUE-312\t기능\t5.19.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-313\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-314\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-317\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-318\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-320\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-321\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-322\tUX/UI\t5.18.0\tMinor\t보통
+[APP] 메인 부가서비스 순서 (https://www.notion.so/APP-2ef73fbd195180ebbf6beee5570833ba?pvs=21)\tISSUE-323\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-324\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-325\t기능\t5.18.0\tCritical\t높음
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-326\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-327\t기능\t5.18.0\tCritical\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-328\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-329\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-330\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-331\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-332\t기능\t5.18.0\tCritical\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-333\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-334\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-336\t성능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-337\t기능\t5.18.0\t개선 의견\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-338\tUX/UI\t5.19.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-339\tUX/UI\t5.18.0\t개선 의견\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-341\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-342\tUX/UI\t5.18.0\t개선 의견\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-343\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-344\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-345\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-346\t기능\t5.18.0\tMajor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-347\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-348\t기능\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-349\tUX/UI\t5.18.0\tMinor\t보통
+[QR 송금/결제]캄보디아 PPCB (송금 5.18.0) 및 (결제 5.19.0) 개발 (https://www.notion.so/QR-PPCB-5-18-0-5-19-0-27073fbd195180aaa27ae57fcb656880?pvs=21)\tISSUE-354\tUX/UI\t5.18.0\tMinor\t보통
+`.trim();
+
+    // ---------------------------
+    // 파서 & 유틸
+    // ---------------------------
+    function parseTSV(tsv){
+      const lines = tsv.split(/\r?\n/).filter(Boolean);
+      const header = lines.shift().split("\t").map(s => s.trim());
+      const rows = [];
+      for (const line of lines){
+        const cols = line.split("\t");
+        const obj = {};
+        header.forEach((h, i) => obj[h] = (cols[i] ?? "").trim());
+        // 완전 빈 행 방지(여기는 ID라도 있으면 유효)
+        if ((obj["ID"] || "").length === 0) continue;
+        rows.push(obj);
+      }
+      return rows;
+    }
+
+    // "(https://...)" 형태 제거
+    function stripHttpParen(text){
+      if (!text) return "";
+      // 괄호 안에 http/https 포함된 구간 제거
+      return text.replace(/\s*\((https?:\/\/[^)]+)\)\s*/gi, " ").replace(/\s{2,}/g, " ").trim();
+    }
+
+    function pct(n, total){
+      if (!total) return "0.0%";
+      return (Math.round((n/total)*1000)/10).toFixed(1) + "%";
+    }
+
+    function sortByCountDesc(entries){
+      return entries.sort((a,b)=> b.count - a.count || a.key.localeCompare(b.key));
+    }
+
+    function aggCount(rows, field, normalizeFn = (v)=>v){
+      const map = new Map();
+      for (const r of rows){
+        const raw = (r[field] ?? "").trim();
+        const key = normalizeFn(raw || "(빈값)");
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+      return map;
+    }
+
+    function toEntries(map){
+      const arr = [];
+      map.forEach((count, key) => arr.push({ key, count }));
+      return arr;
+    }
+
+    // ---------------------------
+    // 렌더러(표)
+    // ---------------------------
+    function renderTable(tbodyEl, entries, total){
+      tbodyEl.innerHTML = "";
+      const max = entries.reduce((m,e)=> Math.max(m, e.count), 0);
+
+      // 최대값(비중 최대) 행 강조
+      const maxKeys = new Set(entries.filter(e=>e.count===max).map(e=>e.key));
+
+      for (const e of entries){
+        const tr = document.createElement("tr");
+        if (maxKeys.has(e.key)) tr.classList.add("hi");
+
+        const td1 = document.createElement("td");
+        td1.textContent = e.key;
+
+        const td2 = document.createElement("td");
+        td2.textContent = String(e.count);
+
+        const td3 = document.createElement("td");
+        td3.textContent = pct(e.count, total);
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+        tbodyEl.appendChild(tr);
+      }
+
+      // total row
+      const trT = document.createElement("tr");
+      trT.className = "total";
+      trT.innerHTML = `
+        <td>총 합계</td>
+        <td>${total}</td>
+        <td>100%</td>
+      `;
+      tbodyEl.appendChild(trT);
+    }
+
+    // ---------------------------
+    // 렌더러(막대)
+    // ---------------------------
+    function renderBars(containerEl, entries, total){
+      containerEl.innerHTML = "";
+      const max = entries.reduce((m,e)=> Math.max(m, e.count), 0) || 1;
+
+      // 최대값(비중 최대) 강조
+      const maxKeys = new Set(entries.filter(e=>e.count===max).map(e=>e.key));
+
+      for (const e of entries){
+        const row = document.createElement("div");
+        row.className = "barrow";
+        if (maxKeys.has(e.key)) row.classList.add("hi");
+
+        const name = document.createElement("div");
+        name.className = "barname";
+        name.title = e.key;
+        name.textContent = e.key;
+
+        const bg = document.createElement("div");
+        bg.className = "barbg";
+
+        const fill = document.createElement("div");
+        fill.className = "barfill";
+        fill.style.width = ((e.count / max) * 100).toFixed(2) + "%";
+        bg.appendChild(fill);
+
+        const val = document.createElement("div");
+        val.className = "barval";
+        val.textContent = `${e.count} · ${pct(e.count, total)}`;
+
+        row.appendChild(name);
+        row.appendChild(bg);
+        row.appendChild(val);
+
+        containerEl.appendChild(row);
+      }
+    }
+
+    // ---------------------------
+    // 실행
+    // ---------------------------
+    const rows = parseTSV(RAW_TSV);
+    const total = rows.length;
+
+    // 1) 심각도 (Critical/Major/Minor/Trivial/개선 의견 등도 포함될 수 있음)
+    const sevMap = aggCount(rows, "심각도", (v)=> (v || "(빈값)").trim());
+    const sevEntries = sortByCountDesc(toEntries(sevMap));
+
+    // 2) 유형
+    const typeMap = aggCount(rows, "결함 유형", (v)=> (v || "(빈값)").trim());
+    const typeEntries = sortByCountDesc(toEntries(typeMap));
+
+    // 3) 피처(ATM) + 링크 제거
+    const featMap = aggCount(rows, "ATM", (v)=> stripHttpParen(v || "(빈값)"));
+    const featEntries = sortByCountDesc(toEntries(featMap));
+
+    // 상단 totals
+    document.getElementById("totalCount1").textContent = `총 ${total}건`;
+    document.getElementById("totalCount2").textContent = `총 ${total}건`;
+    document.getElementById("totalCount3").textContent = `총 ${total}건`;
+
+    // 렌더
+    renderTable(document.getElementById("tbodySeverity"), sevEntries, total);
+    renderBars(document.getElementById("barsSeverity"), sevEntries, total);
+
+    renderTable(document.getElementById("tbodyType"), typeEntries, total);
+    renderBars(document.getElementById("barsType"), typeEntries, total);
+
+    renderTable(document.getElementById("tbodyFeature"), featEntries, total);
+  </script>
+</body>
+</html>
