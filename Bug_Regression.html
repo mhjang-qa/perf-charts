@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif; margin: 24px; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    .meta { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 18px; }
+    .chip { padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 10px; background: #fafafa; font-size: 14px; }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 18px; }
+    @media (min-width: 900px) { .grid { grid-template-columns: 2fr 1fr; } }
+
+    .card { border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px; background: #fff; }
+    .card h2 { font-size: 16px; margin: 0 0 10px; }
+
+    /* 막대차트 영역: 세로 높이 확보 */
+    .bar-wrap { height: 360px; }
+    .bar-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+
+    /* ✅ 도넛: 정사각 컨테이너로 비율 보정 (깨짐 방지 핵심) */
+    .donut-square {
+      width: min(340px, 100%);   /* 카드가 좁아져도 최대 340 */
+      aspect-ratio: 1 / 1;       /* 무조건 정사각형 */
+      margin: 0 auto;            /* 가운데 정렬 */
+    }
+    .donut-square canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    .note { color: #6b7280; font-size: 13px; margin-top: 10px; line-height: 1.45; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    
+
+    <div class="meta">
+      <div class="chip">전체: <b id="total"></b>건</div>
+      <div class="chip">수정 정상 반영: <b id="ok"></b>건 (<b id="okPct"></b>%)</div>
+      <div class="chip">추후 수정: <b id="later"></b>건 (<b id="laterPct"></b>%)</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>막대 그래프</h2>
+        <div class="bar-wrap">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>비율</h2>
+
+        <!-- ✅ 정사각 컨테이너 -->
+        <div class="donut-square">
+          <canvas id="doughnutChart"></canvas>
+        </div>
+
+        <div class="note">
+          보고용 문구 예시:<br/>
+          총 <b id="total2"></b>건 중 <b id="ok2"></b>건(<b id="okPct2"></b>%) 수정사항 정상 반영, <b id="later2"></b>건은 차기 수정 필요
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const data = { total: 36, ok: 31, later: 5 };
+    const okPct = Math.round((data.ok / data.total) * 100);
+    const laterPct = Math.round((data.later / data.total) * 100);
+
+    document.getElementById("total").textContent = data.total;
+    document.getElementById("ok").textContent = data.ok;
+    document.getElementById("later").textContent = data.later;
+    document.getElementById("okPct").textContent = okPct;
+    document.getElementById("laterPct").textContent = laterPct;
+
+    document.getElementById("total2").textContent = data.total;
+    document.getElementById("ok2").textContent = data.ok;
+    document.getElementById("later2").textContent = data.later;
+    document.getElementById("okPct2").textContent = okPct;
+
+    // 막대차트: 화면에 맞게 채우는 게 유리
+    new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: {
+        labels: ["수정 정상 반영", "추후 수정"],
+        datasets: [
+        {
+            label: "건수",
+            data: [31, 5],
+            backgroundColor: [
+            "#3BA3EC", // 수정 정상 반영 (파란색)
+            "#FF5A6E"  // 추후 수정 (붉은색)
+            ],
+            borderColor: [
+            "#3BA3EC",
+            "#FF5A6E"
+            ],
+            borderWidth: 1
+        }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+        legend: {
+            position: "bottom"
+        }
+        },
+        scales: {
+        y: {
+            beginAtZero: true,
+            ticks: {
+            precision: 0
+            }
+        }
+        }
+    }
+    });
+
+    // ✅ 도넛: 정사각 컨테이너 + 비율 유지 (깨짐 방지)
+    new Chart(document.getElementById("doughnutChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["수정 정상 반영", "추후 수정"],
+        datasets: [{ data: [data.ok, data.later], borderWidth: 1 }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 1,      // 원형 유지
+        cutout: "60%",
+        plugins: { legend: { position: "bottom" } }
+      }
+    });
+  </script>
+</body>
+</html>
