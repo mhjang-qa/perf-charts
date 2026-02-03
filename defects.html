@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test Result Pie</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR";
+      background: transparent;
+      color: var(--text);
+    }
+    .wrap {
+      padding: 16px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: rgba(17,24,39,0.72);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 8px;
+    }
+    .canvasBox {
+      height: 320px;
+    }
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="grid">
+      <section class="card">
+        <h3>AOS 결과 분포</h3>
+        <div class="meta">
+          <span class="pill">PASS 41</span>
+          <span class="pill">FAIL 0</span>
+          <span class="pill">NA 10</span>
+          <span class="pill">SUM 51</span>
+        </div>
+        <div class="canvasBox">
+          <canvas id="pieAOS"></canvas>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>iOS 결과 분포</h3>
+        <div class="meta">
+          <span class="pill">PASS 40</span>
+          <span class="pill">FAIL 0</span>
+          <span class="pill">NA 11</span>
+          <span class="pill">SUM 51</span>
+        </div>
+        <div class="canvasBox">
+          <canvas id="pieIOS"></canvas>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const commonOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            color: "#e5e7eb",   // ✅ 레전드 텍스트 색 강제 지정 (핵심)
+            padding: 14,
+            boxWidth: 12,
+            font: {
+              size: 12,
+              weight: "600"
+            }
+          }
+        },
+        tooltip: {
+          titleColor: "#ffffff",
+          bodyColor: "#ffffff",
+          callbacks: {
+            label: (ctx) => {
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const v = ctx.raw;
+              const p = ((v / total) * 100).toFixed(1);
+              return `${ctx.label}: ${v} (${p}%)`;
+            }
+          }
+        }
+      }
+    };
+
+    const labels = ["PASS", "FAIL", "NA"];
+    const colors = ["#3b82f6", "#ef4444", "#22c55e"];
+
+    new Chart(pieAOS, {
+      type: "pie",
+      data: { labels, datasets: [{ data: [41,0,10], backgroundColor: colors }] },
+      options: commonOptions
+    });
+
+    new Chart(pieIOS, {
+      type: "pie",
+      data: { labels, datasets: [{ data: [40,0,11], backgroundColor: colors }] },
+      options: commonOptions
+    });
+  </script>
+</body>
+</html>
