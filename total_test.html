@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>애자일 테스팅 사분면 - Q2 중심</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: "Noto Sans KR", sans-serif;
+  background: #f4f6f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.wrapper {
+  width: 900px;
+  height: 600px;
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  padding: 40px;
+}
+
+.title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  height: 80%;
+  border: 2px solid #ddd;
+}
+
+.quadrant {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 15px;
+  text-align: center;
+}
+
+.q1 {
+  background: #e0f2f1;
+}
+
+.q2 {
+  background: #ff7043;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 4px #d84315;
+}
+
+.q3 {
+  background: #ffe0b2;
+}
+
+.q4 {
+  background: #ede7f6;
+}
+
+.axis-x {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.axis-y {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  font-size: 14px;
+  font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <div class="title">애자일 테스팅 사분면 – Q2 중심</div>
+
+  <div class="grid">
+    <div class="quadrant q1">
+      <div><strong>Q1</strong></div>
+      기술 대면 × 자동화<br>
+      단위 테스트<br>
+      컴포넌트 테스트
+    </div>
+
+    <div class="quadrant q2">
+      <div><strong>Q2 (이번 통테 중심)</strong></div>
+      비즈니스 대면 × 자동화<br>
+      통합 테스트<br>
+      스토리 테스트<br>
+      E2E 검증
+    </div>
+
+    <div class="quadrant q3">
+      <div><strong>Q3</strong></div>
+      비즈니스 대면 × 수동<br>
+      탐색적 테스트<br>
+      UAT
+    </div>
+
+    <div class="quadrant q4">
+      <div><strong>Q4</strong></div>
+      기술 대면 × 수동<br>
+      성능 테스트<br>
+      보안 테스트
+    </div>
+  </div>
+
+  <div class="axis-x">기술 대면 ⟷ 비즈니스 대면</div>
+  <div class="axis-y">자동화 ⟷ 수동</div>
+
+</div>
+
+</body>
+</html>
