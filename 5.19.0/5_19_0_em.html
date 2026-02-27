@@ -18,7 +18,7 @@
       margin:0;
       background:var(--bg);
       color:var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     }
     .wrap{ max-width:980px; margin:0 auto; padding:18px 16px 22px; }
     .grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
@@ -123,29 +123,29 @@
   </div>
 
   <script>
-    // ✅ 5.19.0 입력 데이터 (심각도/유형만)
+    // ✅ 5.19.0 입력 데이터 (19건)
+    // 사용자가 준 포맷: "결함 유형 \t 심각도"
     const RAW_TSV = `
-심각도\t결함 유형
-Minor\tUX/UI
-Minor\tUX/UI
-Major\t기능
-Major\t기능
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
-Major\t기능
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\t기능
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
-Minor\tUX/UI
+결함 유형\t심각도
+UX/UI\tMinor
+기능\tMajor
+기능\tMajor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+기능\tMajor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+기능\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
+UX/UI\tMinor
 `.trim();
 
     function parseTSV(tsv){
@@ -252,7 +252,7 @@ Minor\tUX/UI
     document.getElementById("totalCount1").textContent = `총 ${total}건`;
     document.getElementById("totalCount2").textContent = `총 ${total}건`;
 
-    const sevEntries = toEntries(aggCount(rows, "심각도"));
+    const sevEntries  = toEntries(aggCount(rows, "심각도"));
     const typeEntries = toEntries(aggCount(rows, "결함 유형"));
 
     renderTable(document.getElementById("tbodySeverity"), sevEntries, total);
