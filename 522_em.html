@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>결함 집계 리포트_5.22.0</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#fff;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:18px 16px 22px}.title{font-size:14px;font-weight:800;margin:0 0 10px}
+    
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.04);padding:14px}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.dot{width:6px;height:6px;border-radius:999px;background:#111827}.cardTitle{font-size:13px;font-weight:900}.sub{margin-left:auto;font-size:12px;color:#6b7280}
+table{width:100%;border-collapse:collapse;font-size:12px;overflow:hidden;border-radius:8px}th{text-align:left;padding:10px;background:#f3f4f6;border-bottom:1px solid #e5e7eb;color:#374151}td{padding:9px 10px;border-bottom:1px solid #e5e7eb}tbody tr:nth-child(even){background:#fcfcfd}.total{background:#f3f4f6;font-weight:900}.hi td{color:#ef4444;font-weight:900}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.barwrap{margin-top:10px;display:flex;flex-direction:column;gap:8px}.barrow{display:grid;grid-template-columns:90px 1fr 64px;gap:10px;align-items:center;font-size:12px}.barname{font-weight:800;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.barbg{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden;border:1px solid #e7ebf2}.barfill{height:100%;background:#111827;border-radius:999px}.barval{text-align:right;color:#6b7280;white-space:nowrap}.barrow.hi .barfill{background:#ef4444}.barrow.hi .barname,.barrow.hi .barval{color:#ef4444;font-weight:900}
+
+  </style>
+</head>
+<body><div class="wrap">
+        <div class="grid">
+          
+    <section class="card">
+      <div class="head"><span class="dot"></span><div class="cardTitle">심각도 기준</div><div class="sub">총 8건</div></div>
+      <table><thead><tr><th>구분</th><th style="width:90px">건수</th><th style="width:90px">비율</th></tr></thead><tbody><tr class='hi'><td>Minor</td><td>6</td><td>75.0%</td></tr><tr><td>Major</td><td>2</td><td>25.0%</td></tr><tr class='total'><td>총 합계</td><td>8</td><td>100%</td></tr></tbody></table>
+      <div class='barwrap'><div class='barrow hi'><div class='barname' title='Minor'>Minor</div><div class='barbg'><div class='barfill' style='width:100.00%'></div></div><div class='barval'>6 · 75.0%</div></div><div class='barrow'><div class='barname' title='Major'>Major</div><div class='barbg'><div class='barfill' style='width:33.33%'></div></div><div class='barval'>2 · 25.0%</div></div></div>
+    </section>
+    
+          
+    <section class="card">
+      <div class="head"><span class="dot"></span><div class="cardTitle">유형별 기준</div><div class="sub">총 8건</div></div>
+      <table><thead><tr><th>구분</th><th style="width:90px">건수</th><th style="width:90px">비율</th></tr></thead><tbody><tr class='hi'><td>UX/UI</td><td>2</td><td>25.0%</td></tr><tr class='hi'><td>다국어</td><td>2</td><td>25.0%</td></tr><tr class='hi'><td>접근성</td><td>2</td><td>25.0%</td></tr><tr><td>기능</td><td>1</td><td>12.5%</td></tr><tr><td>성능</td><td>1</td><td>12.5%</td></tr><tr class='total'><td>총 합계</td><td>8</td><td>100%</td></tr></tbody></table>
+      <div class='barwrap'><div class='barrow hi'><div class='barname' title='UX/UI'>UX/UI</div><div class='barbg'><div class='barfill' style='width:100.00%'></div></div><div class='barval'>2 · 25.0%</div></div><div class='barrow hi'><div class='barname' title='다국어'>다국어</div><div class='barbg'><div class='barfill' style='width:100.00%'></div></div><div class='barval'>2 · 25.0%</div></div><div class='barrow hi'><div class='barname' title='접근성'>접근성</div><div class='barbg'><div class='barfill' style='width:100.00%'></div></div><div class='barval'>2 · 25.0%</div></div><div class='barrow'><div class='barname' title='기능'>기능</div><div class='barbg'><div class='barfill' style='width:50.00%'></div></div><div class='barval'>1 · 12.5%</div></div><div class='barrow'><div class='barname' title='성능'>성능</div><div class='barbg'><div class='barfill' style='width:50.00%'></div></div><div class='barval'>1 · 12.5%</div></div></div>
+    </section>
+    
+        </div>
+        </div></body>
+</html>
