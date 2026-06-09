@@ -7,41 +7,24 @@
   <style>
     *{box-sizing:border-box}body{margin:0;background:#fff;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif}
     .wrap{max-width:980px;margin:0 auto;padding:18px 16px 22px}.title{font-size:14px;font-weight:800;margin:0 0 10px}
-    
-        .grid{display:grid;grid-template-columns:repeat(2,minmax(240px,1fr));gap:16px}
-        .card{border:1px solid #e5e7eb;border-radius:8px;padding:12px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-        .cardHead{display:flex;justify-content:space-between;margin-bottom:8px}.h{font-weight:800;font-size:13px}.sum{font-size:12px;color:#6b7280}
-        .chartRow{display:flex;gap:12px;align-items:center;justify-content:space-between}svg{width:260px;max-width:58%;min-width:190px;aspect-ratio:16/9}
-        .legend{flex:1;display:flex;flex-direction:column;gap:8px}.lgItem{display:flex;justify-content:space-between;gap:10px;font-size:12px}
-        .lgLeft{display:flex;gap:8px;font-weight:700}.dot{width:10px;height:10px;border-radius:99px;display:inline-block}.lgRight{color:#6b7280;white-space:nowrap}
-        @media(max-width:700px){.grid{grid-template-columns:1fr}svg{max-width:55%}}
-        
+    .card{border:1px solid #e5e7eb;border-radius:8px;padding:18px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+    .head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+    .h{font-weight:800;font-size:13px}
+    .badge{font-size:12px;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:999px;padding:5px 10px}
+    .body{font-size:13px;line-height:1.6;color:#374151}
+    .body strong{color:#111827}
   </style>
 </head>
-<body><div class="wrap"><div class='title'>OS별 테스트 결과_5.22.1</div><div class='grid'>
-            <section class="card">
-              <div class="cardHead"><div class="h">AOS</div><div class="sum">SUM 410</div></div>
-              <div class="chartRow">
-                <svg viewBox="0 0 320 180" aria-label="AOS pie" data-series='{"NA": 189, "PASS": 219, "FAIL": 2}'></svg>
-                <div class="legend"><div class='lgItem'><div class='lgLeft'><span class='dot' style='background:#0b7285'></span><span>PASS</span></div><div class='lgRight'>219 (53.4%)</div></div><div class='lgItem'><div class='lgLeft'><span class='dot' style='background:#e03131'></span><span>FAIL</span></div><div class='lgRight'>2 (0.5%)</div></div><div class='lgItem'><div class='lgLeft'><span class='dot' style='background:#f08c00'></span><span>NA</span></div><div class='lgRight'>189 (46.1%)</div></div></div>
-              </div>
-            </section>
-            
-            <section class="card">
-              <div class="cardHead"><div class="h">IOS</div><div class="sum">SUM 350</div></div>
-              <div class="chartRow">
-                <svg viewBox="0 0 320 180" aria-label="IOS pie" data-series='{"NA": 175, "FAIL": 3, "PASS": 172}'></svg>
-                <div class="legend"><div class='lgItem'><div class='lgLeft'><span class='dot' style='background:#0b7285'></span><span>PASS</span></div><div class='lgRight'>172 (49.1%)</div></div><div class='lgItem'><div class='lgLeft'><span class='dot' style='background:#e03131'></span><span>FAIL</span></div><div class='lgRight'>3 (0.9%)</div></div><div class='lgItem'><div class='lgLeft'><span class='dot' style='background:#f08c00'></span><span>NA</span></div><div class='lgRight'>175 (50.0%)</div></div></div>
-              </div>
-            </section>
-            </div></div>
-<script>
-const COLORS={PASS:"#0b7285",FAIL:"#e03131",NA:"#f08c00"};
-document.querySelectorAll("svg[data-series]").forEach(svg=>render(svg,JSON.parse(svg.dataset.series||"{}")));
-function render(svg,series){const cx=160,cy=80,r=78,depth=18,keys=["PASS","FAIL","NA"].filter(k=>(series[k]||0)>=0);const total=keys.reduce((a,k)=>a+(series[k]||0),0)||1;let a0=-Math.PI/2;svg.innerHTML="";const base=el("ellipse",{cx,cy:cy+depth+10,rx:r+8,ry:r*.28+6,fill:"#000",opacity:.06});svg.appendChild(base);const bottom=el("g"),top=el("g");keys.forEach(k=>{const v=series[k]||0,a1=a0+v/total*Math.PI*2;bottom.appendChild(el("path",{d:arc(cx,cy+depth,r,a0,a1),fill:shade(COLORS[k],-18),stroke:"rgba(255,255,255,.35)","stroke-width":1}));a0=a1});a0=-Math.PI/2;keys.forEach(k=>{const v=series[k]||0,a1=a0+v/total*Math.PI*2;top.appendChild(el("path",{d:arc(cx,cy,r,a0,a1),fill:COLORS[k],stroke:"#fff","stroke-width":1.2}));const pct=v/total*100;if(pct>=6){const mid=(a0+a1)/2;top.appendChild(el("text",{x:cx+Math.cos(mid)*r*.62,y:cy+Math.sin(mid)*r*.62+4,"text-anchor":"middle","dominant-baseline":"middle","font-size":12,"font-weight":800,fill:"rgba(255,255,255,.95)"},pct.toFixed(0)+"%"))}a0=a1});svg.appendChild(bottom);svg.appendChild(top)}
-function arc(cx,cy,r,a0,a1){const large=a1-a0>Math.PI?1:0,x0=cx+r*Math.cos(a0),y0=cy+r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);return `M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z`}
-function shade(hex,amt){const h=hex.replace("#",""),n=parseInt(h,16);let r=(n>>16)&255,g=(n>>8)&255,b=n&255;r=Math.max(0,Math.min(255,r+amt));g=Math.max(0,Math.min(255,g+amt));b=Math.max(0,Math.min(255,b+amt));return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1)}
-function el(tag,attrs={},text=null){const n=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,String(v)));if(text!==null)n.textContent=text;return n}
-</script>
-</body>
+<body><div class="wrap"><div class='title'>OS별 테스트 결과_5.22.1</div>
+  <section class="card">
+    <div class="head">
+      <div class="h">OS별 테스트 결과</div>
+      <div class="badge">데이터 재사용 제거</div>
+    </div>
+    <div class="body">
+      <strong>5.22.1</strong> 페이지에서 보이던 기존 수치는 <strong>5.22.0</strong>에서 복제된 값이라 제거했습니다.<br>
+      현재 확인된 노션 소스에서는 <strong>5.22.1 결함 데이터</strong>는 확인되지만, 동일 기준의 <strong>AOS/iOS 분리 PASS/FAIL 테이블</strong>은 아직 확인되지 않아 오해를 막기 위해 OS 차트는 비워둡니다.
+    </div>
+  </section>
+</div></body>
 </html>
