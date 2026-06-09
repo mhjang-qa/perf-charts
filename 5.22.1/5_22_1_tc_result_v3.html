@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>5.22.1 Test Case 결과</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+      background: #f5f6f8; color: #222; font-size: 12px;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .title { font-size: 18px; font-weight: 700; margin: 0 0 24px; color: #1f2937; }
+    .card-wrap { display: flex; flex-direction: column; gap: 24px; }
+    .card {
+      background: #fff; border: 1px solid #d9dde3; border-radius: 18px;
+      padding: 20px 20px 18px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      min-height: 360px;
+    }
+    .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .os-name { font-size: 16px; font-weight: 700; color: #111827; }
+    .sum { font-size: 12px; color: #6b7280; }
+    .sum b { color: #4b5563; font-weight: 700; }
+    .content { display: flex; align-items: center; justify-content: center; gap: 28px; padding-top: 8px; }
+    .chart-box { width: 240px; height: 240px; position: relative; }
+    .legend { display: flex; flex-direction: column; gap: 12px; min-width: 150px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #1f2937; }
+    .count { color: #6b7280; font-weight: 600; margin-left: 2px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 10px; }
+    .pass { background: #0b7285; }
+    .fail { background: #e03131; }
+    .na   { background: #f08c00; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">OS별 테스트 결과_5.22.1</h1>
+  <div class="card-wrap">
+    <div class="card">
+      <div class="card-head">
+        <div class="os-name">AOS</div>
+        <div class="sum">SUM <b id="aosSum"></b></div>
+      </div>
+      <div class="content">
+        <div class="chart-box"><canvas id="aosChart"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><span class="dot pass"></span>PASS <span class="count" id="aosPass"></span></div>
+          <div class="legend-item"><span class="dot fail"></span>FAIL <span class="count" id="aosFail"></span></div>
+          <div class="legend-item"><span class="dot na"></span>NA   <span class="count" id="aosNa"></span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <div class="os-name">iOS</div>
+        <div class="sum">SUM <b id="iosSum"></b></div>
+      </div>
+      <div class="content">
+        <div class="chart-box"><canvas id="iosChart"></canvas></div>
+        <div class="legend">
+          <div class="legend-item"><span class="dot pass"></span>PASS <span class="count" id="iosPass"></span></div>
+          <div class="legend-item"><span class="dot fail"></span>FAIL <span class="count" id="iosFail"></span></div>
+          <div class="legend-item"><span class="dot na"></span>NA   <span class="count" id="iosNa"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const data = {
+    AOS: { PASS: 323, FAIL: 17, NA: 89 },
+    IOS: { PASS: 299, FAIL: 13, NA: 83 }
+  };
+
+  ['AOS','IOS'].forEach(os => data[os].sum = data[os].PASS + data[os].FAIL + data[os].NA);
+
+  document.getElementById('aosSum').textContent  = data.AOS.sum;
+  document.getElementById('aosPass').textContent = data.AOS.PASS;
+  document.getElementById('aosFail').textContent = data.AOS.FAIL;
+  document.getElementById('aosNa').textContent   = data.AOS.NA;
+  document.getElementById('iosSum').textContent  = data.IOS.sum;
+  document.getElementById('iosPass').textContent = data.IOS.PASS;
+  document.getElementById('iosFail').textContent = data.IOS.FAIL;
+  document.getElementById('iosNa').textContent   = data.IOS.NA;
+
+  const pctPlugin = {
+    id: 'pct',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      const total = chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
+      meta.data.forEach((arc, i) => {
+        const v = chart.data.datasets[0].data[i];
+        if (!v) return;
+        const pct = Math.round(v / total * 100);
+        const angle = (arc.startAngle + arc.endAngle) / 2;
+        const r = (arc.outerRadius + arc.innerRadius) / 2;
+        const x = arc.x + Math.cos(angle) * r;
+        const y = arc.y + Math.sin(angle) * r;
+        ctx.save();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pct + '%', x, y);
+        ctx.restore();
+      });
+    }
+  };
+
+  function mkChart(id, d) {
+    new Chart(document.getElementById(id), {
+      type: 'pie',
+      data: {
+        labels: ['PASS','FAIL','NA'],
+        datasets: [{ data: [d.PASS, d.FAIL, d.NA], backgroundColor: ['#0b7285','#e03131','#f08c00'], borderColor: '#fff', borderWidth: 2, hoverOffset: 6 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: c => `${c.label}: ${c.raw}건 (${Math.round(c.raw / c.dataset.data.reduce((a,b)=>a+b,0) * 100)}%)` } }
+        }
+      },
+      plugins: [pctPlugin]
+    });
+  }
+
+  mkChart('aosChart', data.AOS);
+  mkChart('iosChart', data.IOS);
+</script>
+</body>
+</html>
