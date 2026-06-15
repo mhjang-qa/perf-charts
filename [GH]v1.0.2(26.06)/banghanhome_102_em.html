@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>결함 집계 리포트_v1.0.2(26.06)</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#fff;color:#111827;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif}
+    .wrap{max-width:980px;margin:0 auto;padding:18px 16px 22px}.title{font-size:14px;font-weight:800;margin:0 0 10px}
+    
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.04);padding:14px}
+.head{display:flex;align-items:center;gap:10px;margin-bottom:10px}.dot{width:6px;height:6px;border-radius:999px;background:#111827}.cardTitle{font-size:13px;font-weight:900}.sub{margin-left:auto;font-size:12px;color:#6b7280}
+table{width:100%;border-collapse:collapse;font-size:12px;overflow:hidden;border-radius:8px}th{text-align:left;padding:10px;background:#f3f4f6;border-bottom:1px solid #e5e7eb;color:#374151}td{padding:9px 10px;border-bottom:1px solid #e5e7eb}tbody tr:nth-child(even){background:#fcfcfd}.total{background:#f3f4f6;font-weight:900}.hi td{color:#ef4444;font-weight:900}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.barwrap{margin-top:10px;display:flex;flex-direction:column;gap:8px}.barrow{display:grid;grid-template-columns:90px 1fr 64px;gap:10px;align-items:center;font-size:12px}.barname{font-weight:800;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.barbg{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden;border:1px solid #e7ebf2}.barfill{height:100%;background:#111827;border-radius:999px}.barval{text-align:right;color:#6b7280;white-space:nowrap}.barrow.hi .barfill{background:#ef4444}.barrow.hi .barname,.barrow.hi .barval{color:#ef4444;font-weight:900}
+  </style>
+</head>
+<body><div class="wrap">
+        <div class="grid">
+          
+    <section class="card">
+      <div class="head"><span class="dot"></span><div class="cardTitle">심각도 기준</div><div class="sub">총 38건</div></div>
+      <table><thead><tr><th>구분</th><th style="width:90px">건수</th><th style="width:90px">비율</th></tr></thead><tbody><tr class="hi"><td>Major</td><td>19</td><td>50.0%</td></tr><tr><td>Minor</td><td>18</td><td>47.4%</td></tr><tr><td>Critical</td><td>1</td><td>2.6%</td></tr><tr class="total"><td>총 합계</td><td>38</td><td>100%</td></tr></tbody></table>
+      <div class="barwrap"><div class="barrow hi"><div class="barname" title="Major">Major</div><div class="barbg"><div class="barfill" style="width:100.00%"></div></div><div class="barval">19 · 50.0%</div></div><div class="barrow"><div class="barname" title="Minor">Minor</div><div class="barbg"><div class="barfill" style="width:94.74%"></div></div><div class="barval">18 · 47.4%</div></div><div class="barrow"><div class="barname" title="Critical">Critical</div><div class="barbg"><div class="barfill" style="width:5.26%"></div></div><div class="barval">1 · 2.6%</div></div></div>
+    </section>
+    
+          
+    <section class="card">
+      <div class="head"><span class="dot"></span><div class="cardTitle">유형별 기준</div><div class="sub">총 38건</div></div>
+      <table><thead><tr><th>구분</th><th style="width:90px">건수</th><th style="width:90px">비율</th></tr></thead><tbody><tr class="hi"><td>기능</td><td>19</td><td>50.0%</td></tr><tr><td>텍스트</td><td>6</td><td>15.8%</td></tr><tr><td>정책 불일치</td><td>5</td><td>13.2%</td></tr><tr><td>UX/UI</td><td>2</td><td>5.3%</td></tr><tr><td>성능</td><td>2</td><td>5.3%</td></tr><tr><td>접근성</td><td>2</td><td>5.3%</td></tr><tr><td>기획서 수정</td><td>1</td><td>2.6%</td></tr><tr><td>다국어</td><td>1</td><td>2.6%</td></tr><tr class="total"><td>총 합계</td><td>38</td><td>100%</td></tr></tbody></table>
+      <div class="barwrap"><div class="barrow hi"><div class="barname" title="기능">기능</div><div class="barbg"><div class="barfill" style="width:100.00%"></div></div><div class="barval">19 · 50.0%</div></div><div class="barrow"><div class="barname" title="텍스트">텍스트</div><div class="barbg"><div class="barfill" style="width:31.58%"></div></div><div class="barval">6 · 15.8%</div></div><div class="barrow"><div class="barname" title="정책 불일치">정책 불일치</div><div class="barbg"><div class="barfill" style="width:26.32%"></div></div><div class="barval">5 · 13.2%</div></div><div class="barrow"><div class="barname" title="UX/UI">UX/UI</div><div class="barbg"><div class="barfill" style="width:10.53%"></div></div><div class="barval">2 · 5.3%</div></div><div class="barrow"><div class="barname" title="성능">성능</div><div class="barbg"><div class="barfill" style="width:10.53%"></div></div><div class="barval">2 · 5.3%</div></div><div class="barrow"><div class="barname" title="접근성">접근성</div><div class="barbg"><div class="barfill" style="width:10.53%"></div></div><div class="barval">2 · 5.3%</div></div><div class="barrow"><div class="barname" title="기획서 수정">기획서 수정</div><div class="barbg"><div class="barfill" style="width:5.26%"></div></div><div class="barval">1 · 2.6%</div></div><div class="barrow"><div class="barname" title="다국어">다국어</div><div class="barbg"><div class="barfill" style="width:5.26%"></div></div><div class="barval">1 · 2.6%</div></div></div>
+    </section>
+    
+        </div>
+        </div>
+</body></html>
