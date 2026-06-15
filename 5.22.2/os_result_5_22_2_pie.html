@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OS별 테스트 결과_5.22.2</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: #f5f6f8;
+      color: #222;
+      font-size: 12px;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .title {
+      margin: 0 0 18px;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .os-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .chart-box {
+      height: 280px;
+      margin-bottom: 16px;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .card {
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center;
+      border: 1px solid #eef0f3;
+      background: #fafafa;
+    }
+    .label {
+      margin-bottom: 6px;
+      color: #6b7280;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .num {
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .pass .num { color: #18a058; }
+    .fail .num { color: #d93025; }
+    .na .num { color: #8a8f98; }
+    .sum .num { color: #111827; }
+    @media (max-width: 800px) {
+      body { padding: 14px; }
+      .os-grid { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .chart-box { height: 240px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">OS별 테스트 결과_5.22.2</h1>
+
+    <div class="os-grid">
+      <section class="panel">
+        <h2>AOS</h2>
+        <div class="chart-box"><canvas id="aosChart"></canvas></div>
+        <div class="summary-grid">
+          <div class="card sum"><div class="label">SUM</div><div class="num">45</div></div>
+          <div class="card pass"><div class="label">PASS</div><div class="num">43</div></div>
+          <div class="card fail"><div class="label">FAIL</div><div class="num">0</div></div>
+          <div class="card na"><div class="label">NA</div><div class="num">2</div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>iOS</h2>
+        <div class="chart-box"><canvas id="iosChart"></canvas></div>
+        <div class="summary-grid">
+          <div class="card sum"><div class="label">SUM</div><div class="num">45</div></div>
+          <div class="card pass"><div class="label">PASS</div><div class="num">43</div></div>
+          <div class="card fail"><div class="label">FAIL</div><div class="num">0</div></div>
+          <div class="card na"><div class="label">NA</div><div class="num">2</div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const chartData = {
+      AOS: { Pass: 43, Fail: 0, NA: 2 },
+      iOS: { Pass: 43, Fail: 0, NA: 2 }
+    };
+    const labels = ['PASS', 'FAIL', 'NA'];
+    const colors = ['#18a058', '#d93025', '#8a8f98'];
+
+    function makePieChart(canvasId, osName) {
+      const values = [chartData[osName].Pass, chartData[osName].Fail, chartData[osName].NA];
+      new Chart(document.getElementById(canvasId), {
+        type: 'pie',
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: colors,
+            borderColor: '#ffffff',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 12, padding: 16, font: { size: 12, weight: 'bold' } }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const value = context.raw;
+                  const rate = total ? ((value / total) * 100).toFixed(1) : '0.0';
+                  return `${context.label}: ${value}건 (${rate}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    makePieChart('aosChart', 'AOS');
+    makePieChart('iosChart', 'iOS');
+  </script>
+</body>
+</html>
