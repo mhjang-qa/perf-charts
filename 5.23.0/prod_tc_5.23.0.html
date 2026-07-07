@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OS별 테스트 결과_5.23.0</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: #f5f6f8;
+      color: #222;
+      font-size: 12px;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+      color: #1f2937;
+    }
+
+    .card-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      width: 100%;
+      background: #fff;
+      border: 1px solid #d9dde3;
+      border-radius: 18px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      min-height: 360px;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .os-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .sum {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .sum b {
+      color: #4b5563;
+      font-weight: 700;
+    }
+
+    .content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      padding-top: 8px;
+    }
+
+    .chart-box {
+      width: 240px;
+      height: 240px;
+      position: relative;
+    }
+
+    .legend {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 150px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .count {
+      color: #6b7280;
+      font-weight: 600;
+      margin-left: 2px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      flex: 0 0 10px;
+    }
+
+    .pass { background: #0b7285; }
+    .fail { background: #e03131; }
+    .na { background: #f08c00; }
+
+    @media (max-width: 900px) {
+      .content {
+        flex-direction: column;
+      }
+
+      .legend {
+        min-width: auto;
+        width: 100%;
+        align-items: center;
+      }
+
+      .title {
+        font-size: 16px;
+      }
+
+      .os-name,
+      .sum,
+      .legend-item {
+        font-size: 12px;
+      }
+
+      .chart-box {
+        width: 220px;
+        height: 220px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">OS별 테스트 결과_5.23.0</h1>
+
+    <div class="card-wrap">
+      <div class="card">
+        <div class="card-head">
+          <div class="os-name">AOS</div>
+          <div class="sum">SUM <b id="aosSum"></b></div>
+        </div>
+        <div class="content">
+          <div class="chart-box">
+            <canvas id="aosChart"></canvas>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="dot pass"></span>PASS <span class="count" id="aosPass"></span></div>
+            <div class="legend-item"><span class="dot fail"></span>FAIL <span class="count" id="aosFail"></span></div>
+            <div class="legend-item"><span class="dot na"></span>NA <span class="count" id="aosNa"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="os-name">iOS</div>
+          <div class="sum">SUM <b id="iosSum"></b></div>
+        </div>
+        <div class="content">
+          <div class="chart-box">
+            <canvas id="iosChart"></canvas>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="dot pass"></span>PASS <span class="count" id="iosPass"></span></div>
+            <div class="legend-item"><span class="dot fail"></span>FAIL <span class="count" id="iosFail"></span></div>
+            <div class="legend-item"><span class="dot na"></span>NA <span class="count" id="iosNa"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const data = {
+      AOS: { PASS: 84, FAIL: 0, NA: 18 },
+      IOS: { PASS: 82, FAIL: 0, NA: 20 }
+    };
+
+    data.AOS.sum = data.AOS.PASS + data.AOS.FAIL + data.AOS.NA;
+    data.IOS.sum = data.IOS.PASS + data.IOS.FAIL + data.IOS.NA;
+
+    document.getElementById('aosSum').innerText = data.AOS.sum;
+    document.getElementById('iosSum').innerText = data.IOS.sum;
+
+    document.getElementById('aosPass').innerText = data.AOS.PASS;
+    document.getElementById('aosFail').innerText = data.AOS.FAIL;
+    document.getElementById('aosNa').innerText = data.AOS.NA;
+
+    document.getElementById('iosPass').innerText = data.IOS.PASS;
+    document.getElementById('iosFail').innerText = data.IOS.FAIL;
+    document.getElementById('iosNa').innerText = data.IOS.NA;
+
+    const centerTextPlugin = {
+      id: 'centerTextPlugin',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        const meta = chart.getDatasetMeta(0);
+        if (!meta || !meta.data || !meta.data.length) return;
+
+        const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+
+        meta.data.forEach((arc, index) => {
+          const value = chart.data.datasets[0].data[index];
+          if (!value) return;
+
+          const percent = Math.round((value / total) * 100);
+          const angle = (arc.startAngle + arc.endAngle) / 2;
+          const radius = (arc.outerRadius + arc.innerRadius) / 2;
+          const x = arc.x + Math.cos(angle) * radius;
+          const y = arc.y + Math.sin(angle) * radius;
+
+          ctx.save();
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 10px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(percent + '%', x, y);
+          ctx.restore();
+        });
+      }
+    };
+
+    function createPieChart(canvasId, osKey) {
+      const ctx = document.getElementById(canvasId);
+      const chartData = data[osKey];
+
+      return new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['PASS', 'FAIL', 'NA'],
+          datasets: [{
+            data: [chartData.PASS, chartData.FAIL, chartData.NA],
+            backgroundColor: ['#0b7285', '#e03131', '#f08c00'],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 0
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const value = context.raw;
+                  const percent = Math.round((value / total) * 100);
+                  return `${context.label}: ${value}건 (${percent}%)`;
+                }
+              }
+            }
+          }
+        },
+        plugins: [centerTextPlugin]
+      });
+    }
+
+    createPieChart('aosChart', 'AOS');
+    createPieChart('iosChart', 'IOS');
+  </script>
+</body>
+</html>
